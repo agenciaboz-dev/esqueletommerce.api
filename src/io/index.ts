@@ -6,6 +6,7 @@ import google from "../google"
 import { SignupForm } from "../types/user/signup"
 import { User, UserPrisma } from "../class/User"
 import { LoginForm } from "../types/user/login"
+import { Category } from "../class/Category"
 
 let io: SocketIoServer | null = null
 
@@ -37,6 +38,8 @@ export const handleSocket = (socket: Socket) => {
     socket.on("user:login", (data: LoginForm) => User.login(socket, data))
     socket.on("user:update", (data: Partial<UserPrisma> & { id: number }) => User.update(data, socket))
     socket.on("user:delete", (data: { id: number }) => User.delete(socket, data.id))
+
+    socket.on("category:list", () => Category.list(socket))
 }
 
 export default { initializeIoServer, getIoInstance, handleSocket }
