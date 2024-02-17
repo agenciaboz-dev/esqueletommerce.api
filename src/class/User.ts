@@ -39,7 +39,7 @@ export class User {
         }
     }
 
-    static async update(data: Partial<UserPrisma> & { id: string }, socket: Socket) {
+    static async update(data: Partial<UserPrisma> & { id: number }, socket: Socket) {
         const user = new User(data.id)
         await user.init()
         user.update(data, socket)
