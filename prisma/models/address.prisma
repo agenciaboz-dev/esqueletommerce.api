@@ -1,0 +1,18 @@
+model Address {
+    id          Int         @id @default(autoincrement())
+    street      String
+    number      String
+    district    String
+    uf          String
+    city        String
+
+    user_id     Int         @unique
+    user        User        @relation(fields: [user_id], references: [id], onDelete: Cascade)
+}
+
+model User {
+    id          Int         @id @default(autoincrement())
+
+    address_id  Int?
+    address     Address?
+}

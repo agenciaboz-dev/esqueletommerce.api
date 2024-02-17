@@ -4,7 +4,14 @@ datasource db {
 }
 
 model Category {
-    id          String          @id
+    id          Int         @id @default(autoincrement())
     name        String
-    cover       String          @db.Text
+    cover       String      @db.Text
+
+    products    Product[]
+}
+
+model Product {
+    id          Int         @id @default(autoincrement())
+    categories  Category[]
 }

@@ -10,9 +10,9 @@ generator client {
 }
 
 model User {
-  id           String  @id
-  username     String  @unique
-  email        String  @unique
+  id           Int      @id @default(autoincrement())
+  username     String   @unique
+  email        String   @unique
   password     String
   name         String
   cpf          String
@@ -20,14 +20,34 @@ model User {
   phone        String
   pronoun      String
   uf           String
-  admin        Boolean @default(false)
-  image        String? @db.Text
+  admin        Boolean  @default(false)
+  image        String?  @db.Text
   google_id    String?
-  google_token String? @db.Text
+  google_token String?  @db.Text
+  address_id   Int?
+  address      Address? @relation(name: "AddressToUser")
+}
+
+model Product {
+  id         Int        @id @default(autoincrement())
+  name       String
+  categories Category[] @relation(name: "CategoryToProduct")
 }
 
 model Category {
-  id    String @id
-  name  String
-  cover String @db.Text
+  id       Int       @id @default(autoincrement())
+  name     String
+  cover    String    @db.Text
+  products Product[] @relation(name: "CategoryToProduct")
+}
+
+model Address {
+  id       Int    @id @default(autoincrement())
+  street   String
+  number   String
+  district String
+  uf       String
+  city     String
+  user_id  Int    @unique
+  user     User   @relation(name: "AddressToUser", fields: [user_id], references: [id], onDelete: Cascade)
 }

@@ -5,14 +5,11 @@ import { Socket } from "socket.io"
 import { SignupForm } from "../types/user/signup"
 import { uid } from "uid"
 import { LoginForm } from "../types/user/login"
-import { Creator, CreatorPrisma } from "./Creator"
-import { Course } from "./Course"
-import { PaymentCard } from "./PaymentCard"
 
 export type UserPrisma = Prisma.UserGetPayload<{ include: typeof include }>
 
 export class User {
-    id: string
+    id: number
     username: string
     email: string
     password: string
@@ -25,21 +22,11 @@ export class User {
     admin: boolean
 
     image: string | null
-    cover: string | null
-    bio: string | null
 
     google_id: string | null
     google_token: string | null
 
-    creator_id: string | null
-    creator: Creator | null = null
-
-    favorite_creators: Creator[] = []
-    favorite_courses: Course[] = []
-
-    payment_cards: PaymentCard[] = []
-
-    constructor(id: string) {
+    constructor(id: number) {
         this.id = id
     }
 
@@ -60,7 +47,7 @@ export class User {
 
     static async signup(socket: Socket, data: SignupForm) {
         const user_prisma = await prisma.user.create({
-            data: { ...data, id: uid() },
+            data: data,
             include,
         })
 
@@ -111,32 +98,9 @@ export class User {
         this.admin = data.admin
 
         this.image = data.image
-        this.cover = data.cover
 
         this.google_id = data.google_id
         this.google_token = data.google_token
-
-        this.creator_id = data.creator_id
-
-        if (data.creator_id) {
-            const creator = new Creator(data.creator_id)
-            await creator.init()
-            this.creator = creator
-        }
-
-        const favorite_creators = await Promise.all(
-            data.favorite_creators.map(async (creator) => {
-                const new_creator = new Creator(creator.id)
-                await new_creator.init()
-                return new_creator
-            })
-        )
-        this.favorite_creators = favorite_creators
-
-        const favorite_courses: Course[] = []
-        this.favorite_courses = favorite_courses
-
-        this.payment_cards = data.payment_cards.map((item) => new PaymentCard(item))
     }
 
     async update(data: Partial<UserPrisma>, socket?: Socket) {
@@ -145,24 +109,7 @@ export class User {
                 where: { id: this.id },
                 data: {
                     ...data,
-
-                    courses: {
-                        disconnect: data.courses?.map((course) => ({ id: course.id })),
-                        connect: data.courses?.map((course) => ({ id: course.id })),
-                    },
-                    favorite_courses: {
-                        disconnect: data.favorite_courses?.map((course) => ({ id: course.id })),
-                        connect: data.favorite_courses?.map((course) => ({ id: course.id })),
-                    },
-                    favorite_creators: {
-                        disconnect: data.favorite_creators?.map((creator) => ({ id: creator.id })),
-                        connect: data.favorite_creators?.map((creator) => ({ id: creator.id })),
-                    },
-                    payment_cards: {
-                        disconnect: data.payment_cards?.map((creator) => ({ id: creator.id })),
-                        connect: data.payment_cards?.map((creator) => ({ id: creator.id })),
-                    },
-                    creator: {},
+                    address: {},
                 },
                 include: include,
             })

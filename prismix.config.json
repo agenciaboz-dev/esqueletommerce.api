@@ -4,7 +4,9 @@
             "input": [
                 "prisma/base.prisma",
                 "prisma/models/user.prisma",
-                "prisma/models/category.prisma"
+                "prisma/models/product.prisma",
+                "prisma/models/category.prisma",
+                "prisma/models/address.prisma"
             ],
             "output": "prisma/schema.prisma"
         }
