@@ -36,6 +36,7 @@ export const handleSocket = (socket: Socket) => {
     socket.on("user:list", () => User.list(socket))
     socket.on("user:login", (data: LoginForm) => User.login(socket, data))
     socket.on("user:update", (data: Partial<UserPrisma> & { id: number }) => User.update(data, socket))
+    socket.on("user:delete", (data: { id: number }) => User.delete(socket, data.id))
 }
 
 export default { initializeIoServer, getIoInstance, handleSocket }

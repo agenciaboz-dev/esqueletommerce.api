@@ -5,6 +5,7 @@ import { Socket } from "socket.io"
 import { SignupForm } from "../types/user/signup"
 import { uid } from "uid"
 import { LoginForm } from "../types/user/login"
+import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library"
 
 export type UserPrisma = Prisma.UserGetPayload<{ include: typeof include }>
 
@@ -46,14 +47,36 @@ export class User {
     }
 
     static async signup(socket: Socket, data: SignupForm) {
-        const user_prisma = await prisma.user.create({
-            data: data,
-            include,
-        })
+        try {
+            const user_prisma = await prisma.user.create({
+                data: data,
+                include,
+            })
 
-        const user = new User(user_prisma.id)
-        await user.init()
-        socket.emit("user:signup", user)
+            const user = new User(user_prisma.id)
+            await user.init()
+            socket.emit("user:signup", user)
+        } catch (error) {
+            if (error instanceof PrismaClientKnownRequestError) {
+                const errors = [
+                    { key: "username", message: "nome de usuário já cadastrado" },
+                    { key: "email", message: "e-mail já cadastrado" },
+                    { key: "cpf", message: "cpf já cadastrado" },
+                    { key: "google_id", message: "conta google já cadastrada" },
+                ]
+
+                const target = error.meta?.target as string | undefined
+                const match = target?.match(/_(.*?)_/)
+                if (match) {
+                    const key = match[1]
+                    const message = errors.find((item) => item.key == key)?.message
+                    socket.emit("user:signup:error", message)
+                    return
+                }
+            }
+
+            socket.emit("user:signup:error", error?.toString())
+        }
     }
 
     static async list(socket: Socket) {
@@ -81,6 +104,16 @@ export class User {
             socket.emit("user:login", user)
         } else {
             socket.emit("user:login", null)
+        }
+    }
+
+    static async delete(socket: Socket, id: number) {
+        try {
+            const deleted = await prisma.user.delete({ where: { id } })
+            socket.emit("user:delete", deleted)
+        } catch (error) {
+            console.log(error)
+            socket.emit("user:delete:error", error?.toString())
         }
     }
 
