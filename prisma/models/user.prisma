@@ -9,7 +9,7 @@ model User {
     email           String      @unique
     password        String
     name            String
-    cpf             String
+    cpf             String      @unique
     birth           String
     phone           String      
     pronoun         String
@@ -18,6 +18,6 @@ model User {
 
     image           String?     @db.Text
 
-    google_id       String?
+    google_id       String?     @unique
     google_token    String?     @db.Text
 }
