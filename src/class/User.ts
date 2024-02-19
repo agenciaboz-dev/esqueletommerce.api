@@ -11,7 +11,6 @@ export type UserPrisma = Prisma.UserGetPayload<{ include: typeof include }>
 
 export class User {
     id: number
-    username: string
     email: string
     password: string
     name: string
@@ -19,7 +18,6 @@ export class User {
     birth: string
     phone: string
     pronoun: string
-    uf: string
     admin: boolean
 
     image: string | null
@@ -51,17 +49,17 @@ export class User {
             const user_prisma = await prisma.user.create({
                 data: {
                     ...data,
-                    address: data.address
-                        ? {
-                              create: {
-                                  city: data.address.city,
-                                  district: data.address.district,
-                                  number: data.address.number,
-                                  street: data.address.street,
-                                  uf: data.address.uf,
-                              },
-                          }
-                        : {},
+                    // address: data.address
+                    //     ? {
+                    //           create: {
+                    //               city: data.address.city,
+                    //               district: data.address.district,
+                    //               number: data.address.number,
+                    //               street: data.address.street,
+                    //               uf: data.address.uf,
+                    //           },
+                    //       }
+                    //     : {},
                 },
                 include,
             })
@@ -107,7 +105,7 @@ export class User {
 
     static async login(socket: Socket, data: LoginForm) {
         const user_prisma = await prisma.user.findFirst({
-            where: { OR: [{ email: data.login }, { username: data.login }, { cpf: data.login }], password: data.password, admin: data.admin },
+            where: { OR: [{ email: data.login }, { cpf: data.login }], password: data.password, admin: data.admin },
             include,
         })
 
@@ -134,13 +132,11 @@ export class User {
         this.id = data.id
         this.cpf = data.cpf
         this.birth = data.birth
-        this.username = data.username
         this.email = data.email
         this.name = data.name
         this.password = data.password
         this.phone = data.phone
         this.pronoun = data.pronoun
-        this.uf = data.uf
         this.admin = data.admin
 
         this.image = data.image
