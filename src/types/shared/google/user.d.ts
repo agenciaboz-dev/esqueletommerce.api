@@ -1,4 +1,4 @@
-export declare interface People {
+export declare interface GoogleUser {
     googleId?: string | null
     name?: string | null
     emails?: string[]

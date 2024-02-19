@@ -3,9 +3,9 @@ import { Server as HttpServer } from "http"
 import { Server as HttpsServer } from "https"
 import { Socket } from "socket.io"
 import google from "../google"
-import { SignupForm } from "../types/user/signup"
+import { SignupForm } from "../types/shared/user/signup"
 import { User, UserPrisma } from "../class/User"
-import { LoginForm } from "../types/user/login"
+import { LoginForm } from "../types/shared/user/login"
 import { Category } from "../class/Category"
 
 let io: SocketIoServer | null = null

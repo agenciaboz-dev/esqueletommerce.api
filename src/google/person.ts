@@ -2,7 +2,7 @@ import { people_v1 } from "@googleapis/people"
 import { OAuth2Client } from "google-auth-library"
 import { Socket } from "socket.io"
 import { User } from "@prisma/client"
-import { People } from "../types/google/People"
+import { GoogleUser } from "../types/shared/google/user"
 
 const getPerson = (socket: Socket, accessToken: string) => {
     const oAuth2Client = new OAuth2Client()
@@ -17,7 +17,7 @@ const getPerson = (socket: Socket, accessToken: string) => {
 
     console.log(people)
 
-    return new Promise<People>((resolve, reject) => {
+    return new Promise<GoogleUser>((resolve, reject) => {
         people.people.get(
             {
                 resourceName: "people/me",
@@ -32,7 +32,7 @@ const getPerson = (socket: Socket, accessToken: string) => {
                 const person = response?.data
 
                 if (person) {
-                    const personData: People = {
+                    const personData: GoogleUser = {
                         googleId: person.resourceName,
                         name: person.names ? person.names[0].displayName : null,
                         emails: person.emailAddresses?.filter((item) => !!item?.value).map((item) => item.value!),

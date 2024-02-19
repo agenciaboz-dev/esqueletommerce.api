@@ -2,9 +2,9 @@ import { Prisma } from "@prisma/client";
 import { user as include } from "../prisma/include"
 import { prisma } from "../prisma"
 import { Socket } from "socket.io"
-import { SignupForm } from "../types/user/signup"
+import { SignupForm } from "../types/shared/user/signup"
 import { uid } from "uid"
-import { LoginForm } from "../types/user/login"
+import { LoginForm } from "../types/shared/user/login"
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library"
 
 export type UserPrisma = Prisma.UserGetPayload<{ include: typeof include }>
