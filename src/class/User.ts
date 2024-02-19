@@ -49,7 +49,20 @@ export class User {
     static async signup(socket: Socket, data: SignupForm) {
         try {
             const user_prisma = await prisma.user.create({
-                data: data,
+                data: {
+                    ...data,
+                    address: data.address
+                        ? {
+                              create: {
+                                  city: data.address.city,
+                                  district: data.address.district,
+                                  number: data.address.number,
+                                  street: data.address.street,
+                                  uf: data.address.uf,
+                              },
+                          }
+                        : {},
+                },
                 include,
             })
 
