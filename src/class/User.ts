@@ -70,7 +70,8 @@ export class User {
 
             const user = new User(user_prisma.id)
             await user.init()
-            socket.emit("user:signup", user)
+            socket.emit("user:signup:success", user)
+            socket.broadcast.emit("user:signup", user)
         } catch (error) {
             handlePrismaError(error, socket)
             socket.emit("user:signup:error", error?.toString())
@@ -108,7 +109,8 @@ export class User {
     static async delete(socket: Socket, id: number) {
         try {
             const deleted = await prisma.user.delete({ where: { id } })
-            socket.emit("user:delete", deleted)
+            socket.emit("user:delete:success", deleted)
+            socket.broadcast.emit("user:delete", deleted)
         } catch (error) {
             console.log(error)
             socket.emit("user:delete:error", error?.toString())
@@ -169,6 +171,7 @@ export class User {
             await this.load(user_prisma)
 
             if (socket) {
+                socket.emit("user:update:success", this)
                 socket.emit("user:update", this)
                 socket.broadcast.emit("user:update", this)
             }
