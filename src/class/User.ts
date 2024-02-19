@@ -16,7 +16,7 @@ export class User {
     password: string
     name: string
     cpf: string
-    birth: Date
+    birth: string
     phone: string
     pronoun: string
     uf: string
@@ -120,7 +120,7 @@ export class User {
     async load(data: UserPrisma) {
         this.id = data.id
         this.cpf = data.cpf
-        this.birth = new Date(Number(data.birth))
+        this.birth = data.birth
         this.username = data.username
         this.email = data.email
         this.name = data.name
