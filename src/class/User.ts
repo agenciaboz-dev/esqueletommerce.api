@@ -6,6 +6,8 @@ import { SignupForm } from "../types/shared/user/signup"
 import { uid } from "uid"
 import { LoginForm } from "../types/shared/user/login"
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library"
+import { Address } from "./Address"
+import { handlePrismaError, user_errors } from "../prisma/errors"
 
 export type UserPrisma = Prisma.UserGetPayload<{ include: typeof include }>
 
@@ -24,6 +26,8 @@ export class User {
 
     google_id: string | null
     google_token: string | null
+
+    address?: Address
 
     constructor(id: number) {
         this.id = id
@@ -49,17 +53,17 @@ export class User {
             const user_prisma = await prisma.user.create({
                 data: {
                     ...data,
-                    // address: data.address
-                    //     ? {
-                    //           create: {
-                    //               city: data.address.city,
-                    //               district: data.address.district,
-                    //               number: data.address.number,
-                    //               street: data.address.street,
-                    //               uf: data.address.uf,
-                    //           },
-                    //       }
-                    //     : {},
+                    address: data.address
+                        ? {
+                              create: {
+                                  city: data.address.city,
+                                  district: data.address.district,
+                                  number: data.address.number,
+                                  street: data.address.street,
+                                  uf: data.address.uf,
+                              },
+                          }
+                        : {},
                 },
                 include,
             })
@@ -68,24 +72,7 @@ export class User {
             await user.init()
             socket.emit("user:signup", user)
         } catch (error) {
-            if (error instanceof PrismaClientKnownRequestError) {
-                const errors = [
-                    { key: "username", message: "nome de usuário já cadastrado" },
-                    { key: "email", message: "e-mail já cadastrado" },
-                    { key: "cpf", message: "cpf já cadastrado" },
-                    { key: "google_id", message: "conta google já cadastrada" },
-                ]
-
-                const target = error.meta?.target as string | undefined
-                const match = target?.match(/_(.*?)_/)
-                if (match) {
-                    const key = match[1]
-                    const message = errors.find((item) => item.key == key)?.message
-                    socket.emit("user:signup:error", message)
-                    return
-                }
-            }
-
+            handlePrismaError(error, socket)
             socket.emit("user:signup:error", error?.toString())
         }
     }
@@ -143,24 +130,54 @@ export class User {
 
         this.google_id = data.google_id
         this.google_token = data.google_token
+
+        if (data.address) this.address = new Address(data.address)
     }
 
     async update(data: Partial<UserPrisma>, socket?: Socket) {
+        console.log(data)
         try {
             const user_prisma = await prisma.user.update({
                 where: { id: this.id },
                 data: {
                     ...data,
-                    address: {},
+                    address: data.address
+                        ? this.address
+                            ? {
+                                  update: {
+                                      city: data.address.city,
+                                      district: data.address.district,
+                                      number: data.address.number,
+                                      street: data.address.street,
+                                      uf: data.address.uf,
+                                  },
+                              }
+                            : {
+                                  create: {
+                                      city: data.address.city,
+                                      district: data.address.district,
+                                      number: data.address.number,
+                                      street: data.address.street,
+                                      uf: data.address.uf,
+                                  },
+                              }
+                        : {},
                 },
                 include: include,
             })
 
             await this.load(user_prisma)
 
-            socket && socket.emit("user:update", this)
+            if (socket) {
+                socket.emit("user:update", this)
+                socket.broadcast.emit("user:update", this)
+            }
         } catch (error) {
             console.log(error)
+            if (socket) {
+                handlePrismaError(error, socket)
+                socket.emit("user:update:error", error?.toString())
+            }
         }
     }
 }
