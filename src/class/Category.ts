@@ -3,6 +3,7 @@ import { category as include } from "../prisma/include"
 import { prisma } from "../prisma"
 import { Socket } from "socket.io"
 import { CategoryForm } from "../types/shared/category/update"
+import { saveImage } from "../tools/saveImage"
 
 export type CategoryPrisma = Prisma.CategoryGetPayload<{ include: typeof include }>
 
