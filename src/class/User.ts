@@ -78,7 +78,7 @@ export class User {
                 // @ts-ignore
                 if (data.image?.file) {
                     // @ts-ignore
-                    const url = user.updateImage(data.image)
+                    const url = saveImage(`users/${this.id}/`, image.file as ArrayBuffer, image.name)
                     await user.update({ image: url })
                 }
             }
@@ -153,7 +153,7 @@ export class User {
         // @ts-ignore
         if (data.image?.file) {
             // @ts-ignore
-            data.image = this.updateImage(data.image)
+            data.image = saveImage(`users/${this.id}/`, data.image.file as ArrayBuffer, data.image.name)
         }
         try {
             const user_prisma = await prisma.user.update({
@@ -203,8 +203,4 @@ export class User {
         }
     }
 
-    updateImage(image: ImageUpload) {
-        const url = saveImage(`users/${this.id}/`, image.file as ArrayBuffer, image.name)
-        return url
-    }
 }
