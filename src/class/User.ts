@@ -8,6 +8,8 @@ import { LoginForm } from "../types/shared/user/login"
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library"
 import { Address } from "./Address"
 import { handlePrismaError, user_errors } from "../prisma/errors"
+import { ImageUpload } from "../types/shared/ImageUpload"
+import { saveImage } from "../tools/saveImage"
 
 export type UserPrisma = Prisma.UserGetPayload<{ include: typeof include }>
 
@@ -53,6 +55,7 @@ export class User {
             const user_prisma = await prisma.user.create({
                 data: {
                     ...data,
+                    image: "",
                     address: data.address
                         ? {
                               create: {
@@ -71,6 +74,15 @@ export class User {
 
             const user = new User(user_prisma.id)
             await user.init()
+            if (data.image) {
+                // @ts-ignore
+                if (data.image?.file) {
+                    // @ts-ignore
+                    const url = user.updateImage(data.image)
+                    await user.update({ image: url })
+                }
+            }
+
             socket.emit("user:signup:success", user)
             socket.broadcast.emit("user:signup", user)
         } catch (error) {
@@ -138,7 +150,11 @@ export class User {
     }
 
     async update(data: Partial<UserPrisma>, socket?: Socket) {
-        console.log(data)
+        // @ts-ignore
+        if (data.image?.file) {
+            // @ts-ignore
+            data.image = this.updateImage(data.image)
+        }
         try {
             const user_prisma = await prisma.user.update({
                 where: { id: this.id },
@@ -185,5 +201,10 @@ export class User {
                 socket.emit("user:update:error", error?.toString())
             }
         }
+    }
+
+    updateImage(image: ImageUpload) {
+        const url = saveImage(`users/${this.id}/`, image.file as ArrayBuffer, image.name)
+        return url
     }
 }
