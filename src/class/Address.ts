@@ -4,6 +4,7 @@ export type AddressPrisma = Prisma.AddressGetPayload<{}>
 
 export class Address {
     id: number
+    cep: string
     street: string
     number: string
     district: string
@@ -17,6 +18,7 @@ export class Address {
 
     init(data: AddressPrisma) {
         this.id = data.id
+        this.cep = data.cep
         this.city = data.city
         this.district = data.district
         this.number = data.number

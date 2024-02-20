@@ -1,4 +1,4 @@
-import { Prisma } from "@prisma/client";
+import { Prisma } from "@prisma/client"
 import { user as include } from "../prisma/include"
 import { prisma } from "../prisma"
 import { Socket } from "socket.io"
@@ -56,6 +56,7 @@ export class User {
                     address: data.address
                         ? {
                               create: {
+                                  cep: data.address.cep,
                                   city: data.address.city,
                                   district: data.address.district,
                                   number: data.address.number,
@@ -152,6 +153,7 @@ export class User {
                                       number: data.address.number,
                                       street: data.address.street,
                                       uf: data.address.uf,
+                                      cep: data.address.cep,
                                   },
                               }
                             : {
@@ -161,6 +163,7 @@ export class User {
                                       number: data.address.number,
                                       street: data.address.street,
                                       uf: data.address.uf,
+                                      cep: data.address.cep,
                                   },
                               }
                         : {},

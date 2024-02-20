@@ -41,6 +41,7 @@ model Category {
 
 model Address {
   id       Int    @id @default(autoincrement())
+  cep      String
   street   String
   number   String
   district String
