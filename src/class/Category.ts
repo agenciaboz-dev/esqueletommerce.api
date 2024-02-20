@@ -32,7 +32,7 @@ export class Category {
             // @ts-ignore
             if (data.image?.file) {
                 // @ts-ignore
-                const url = saveImage(`categories/${this.id}/`, image.file as ArrayBuffer, image.name)
+                const url = saveImage(`categories/${this.id}/`, data.image.file as ArrayBuffer, data.image.name)
                 await category.update({ image: url })
             }
         }
