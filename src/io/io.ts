@@ -6,8 +6,9 @@ import google from "../google"
 import { SignupForm } from "../types/shared/user/signup"
 import { User, UserPrisma } from "../class/User"
 import { LoginForm } from "../types/shared/user/login"
-import { Category } from "../class/Category"
+import { Category, CategoryPrisma } from "../class/Category"
 import { Address } from "../class/Address"
+import { CategoryForm } from "../types/shared/category/update"
 
 let io: SocketIoServer | null = null
 
@@ -41,6 +42,9 @@ export const handleSocket = (socket: Socket) => {
     socket.on("user:delete", (data: { id: number }) => User.delete(socket, data.id))
 
     socket.on("category:list", () => Category.list(socket))
+    socket.on("category:new", (data: CategoryForm) => Category.new(socket, data))
+    socket.on("category:update", (data: Partial<CategoryPrisma> & { id: number }) => Category.update(socket, data))
+    socket.on("category:delete", (data: { id: number }) => Category.delete(socket, data.id))
 
     socket.on("cep:search", (data: { cep: string }) => Address.searchCep(data.cep, socket))
 }

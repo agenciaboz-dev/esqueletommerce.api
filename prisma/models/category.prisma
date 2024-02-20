@@ -6,7 +6,7 @@ datasource db {
 model Category {
     id          Int         @id @default(autoincrement())
     name        String
-    cover       String      @db.Text
+    image       String?     @db.Text
 
     products    Product[]
 }

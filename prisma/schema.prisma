@@ -35,7 +35,7 @@ model Product {
 model Category {
   id       Int       @id @default(autoincrement())
   name     String
-  cover    String    @db.Text
+  image    String?   @db.Text
   products Product[] @relation(name: "CategoryToProduct")
 }
 

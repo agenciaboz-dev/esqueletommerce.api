@@ -38,7 +38,7 @@ export class User {
     async init() {
         const user_prisma = await prisma.user.findUnique({ where: { id: this.id }, include })
         if (user_prisma) {
-            await this.load(user_prisma)
+            this.load(user_prisma)
         } else {
             throw "usuário não encontrado"
         }
@@ -87,7 +87,6 @@ export class User {
             socket.broadcast.emit("user:signup", user)
         } catch (error) {
             handlePrismaError(error, socket) || socket.emit("user:signup:error", error?.toString())
-            
         }
     }
 
@@ -130,7 +129,7 @@ export class User {
         }
     }
 
-    async load(data: UserPrisma) {
+    load(data: UserPrisma) {
         this.id = data.id
         this.cpf = data.cpf
         this.birth = data.birth
@@ -187,7 +186,7 @@ export class User {
                 include: include,
             })
 
-            await this.load(user_prisma)
+            this.load(user_prisma)
 
             if (socket) {
                 socket.emit("user:update:success", this)
@@ -201,5 +200,4 @@ export class User {
             }
         }
     }
-
 }
