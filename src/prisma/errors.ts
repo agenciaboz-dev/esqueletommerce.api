@@ -3,9 +3,9 @@ import { Socket } from "socket.io"
 
 export const user_errors = [
     { key: "username", message: "nome de usuário já cadastrado" },
-    { key: "email", message: "e-mail já cadastrado" },
-    { key: "cpf", message: "cpf já cadastrado" },
-    { key: "google_id", message: "conta google já cadastrada" },
+    { key: "email", message: "erro: este e-mail já está cadastrado" },
+    { key: "cpf", message: "erro: cpf já cadastrado" },
+    { key: "google_id", message: "erro: conta google já cadastrada" },
 ]
 
 export const handlePrismaError = (error: unknown, socket: Socket) => {
@@ -16,7 +16,9 @@ export const handlePrismaError = (error: unknown, socket: Socket) => {
             const key = match[1]
             const message = user_errors.find((item) => item.key == key)?.message
             socket.emit("user:signup:error", message)
-            return
+            return true
         }
     }
+
+    return
 }

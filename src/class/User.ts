@@ -86,8 +86,8 @@ export class User {
             socket.emit("user:signup:success", user)
             socket.broadcast.emit("user:signup", user)
         } catch (error) {
-            handlePrismaError(error, socket)
-            socket.emit("user:signup:error", error?.toString())
+            handlePrismaError(error, socket) || socket.emit("user:signup:error", error?.toString())
+            
         }
     }
 
@@ -197,8 +197,7 @@ export class User {
         } catch (error) {
             console.log(error)
             if (socket) {
-                handlePrismaError(error, socket)
-                socket.emit("user:update:error", error?.toString())
+                handlePrismaError(error, socket) || socket.emit("user:update:error", error?.toString())
             }
         }
     }
