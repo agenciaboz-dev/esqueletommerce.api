@@ -7,6 +7,7 @@ import { SignupForm } from "../types/shared/user/signup"
 import { User, UserPrisma } from "../class/User"
 import { LoginForm } from "../types/shared/user/login"
 import { Category } from "../class/Category"
+import { Address } from "../class/Address"
 
 let io: SocketIoServer | null = null
 
@@ -40,6 +41,8 @@ export const handleSocket = (socket: Socket) => {
     socket.on("user:delete", (data: { id: number }) => User.delete(socket, data.id))
 
     socket.on("category:list", () => Category.list(socket))
+
+    socket.on("cep:search", (data: { cep: string }) => Address.searchCep(data.cep, socket))
 }
 
 export default { initializeIoServer, getIoInstance, handleSocket }

@@ -1,4 +1,6 @@
 import { Prisma } from "@prisma/client"
+import viacep from "../api/viacep"
+import { Socket } from "socket.io"
 
 export type AddressPrisma = Prisma.AddressGetPayload<{}>
 
@@ -14,6 +16,20 @@ export class Address {
 
     constructor(data: AddressPrisma) {
         this.init(data)
+    }
+
+    static async searchCep(cep: string, socket?: Socket) {
+        try {
+            const response = await viacep.search(cep.replace(/\D/g, ""))
+            const address = response.data
+
+            if (socket) {
+                socket.emit(address.erro ? "cep:search:error" : "cep:search", address)
+            }
+        } catch (error) {
+            console.log(error)
+            socket?.emit("cep:search:error", error?.toString())
+        }
     }
 
     init(data: AddressPrisma) {
