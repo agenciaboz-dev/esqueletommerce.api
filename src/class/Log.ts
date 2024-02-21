@@ -2,6 +2,7 @@ import { Prisma } from "@prisma/client"
 import { getIoInstance } from "../io/io"
 import { prisma } from "../prisma"
 import { LogInit } from "../types/LogInit"
+import { Socket } from "socket.io"
 
 export type LogPrisma = Prisma.LogGetPayload<{}>
 
@@ -13,6 +14,14 @@ export class Log {
     constructor(data: LogInit) {
         if (data.text) this.save(data.text)
         if (data.log) this.load(data.log)
+    }
+
+    static async list(socket: Socket) {
+        const logs = await prisma.log.findMany()
+        logs.forEach((log_prisma) => {
+            const log = new Log({ log: log_prisma })
+            socket.emit("log:update", log)
+        })
     }
 
     load(data: LogPrisma) {
