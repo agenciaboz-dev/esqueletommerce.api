@@ -10,6 +10,8 @@ import { Category, CategoryPrisma } from "../class/Category"
 import { Address } from "../class/Address"
 import { CategoryForm } from "../types/shared/category/update"
 import { Log } from "../class/Log"
+import { SupplierForm } from "../types/shared/SupplierForm"
+import { Supplier, SupplierPrisma } from "../class/Supplier"
 
 let io: SocketIoServer | null = null
 
@@ -50,6 +52,11 @@ export const handleSocket = (socket: Socket) => {
     socket.on("cep:search", (data: { cep: string }) => Address.searchCep(data.cep, socket))
 
     socket.on("log:list", () => Log.list(socket))
+
+    socket.on("supplier:list", () => Supplier.list(socket))
+    socket.on("supplier:new", (data: SupplierForm, user_id: number) => Supplier.new(data, user_id, socket))
+    socket.on("supplier:update", (data: Partial<SupplierPrisma> & { id: number }, user_id) => Supplier.update(socket, data, user_id))
+    socket.on("supplier:delete", (id: number, user_id: number) => Supplier.delete(socket, id, user_id))
 }
 
 export default { initializeIoServer, getIoInstance, handleSocket }

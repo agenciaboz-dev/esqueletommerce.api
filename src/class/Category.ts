@@ -19,7 +19,8 @@ export class Category {
     }
 
     static async list(socket: Socket) {
-        const list = await prisma.category.findMany({ include })
+        const categories = await prisma.category.findMany({ include })
+        const list = categories.map((category_prisma) => new Category(category_prisma))
         socket.emit("category:list", list)
     }
 

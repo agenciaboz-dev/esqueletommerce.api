@@ -1,0 +1,29 @@
+model Supplier {
+    id          Int         @id @default(autoincrement())
+    name        String
+    cnpj        String
+    code        String
+
+    contact_id  Int         @unique
+    contact     Contact     @relation(fields: [contact_id], references: [id], onDelete: Cascade)
+
+    products    Product[]
+}
+
+model Contact {
+    id          Int         @id @default(autoincrement())
+
+    name        String
+    phone       String?
+    email       String?
+
+    supplier_id Int?         
+    supplier    Supplier?
+}
+
+model Product {
+    id          Int         @id @default(autoincrement())
+
+    supplier_id Int
+    supplier    Supplier    @relation(fields: [supplier_id], references: [id], onDelete: Cascade)
+}

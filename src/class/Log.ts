@@ -18,10 +18,8 @@ export class Log {
 
     static async list(socket: Socket) {
         const logs = await prisma.log.findMany()
-        logs.forEach((log_prisma) => {
-            const log = new Log({ log: log_prisma })
-            socket.emit("log:update", log)
-        })
+        const list = logs.map((log_prisma) => new Log({ log: log_prisma }))
+        socket.emit("log:list", list)
     }
 
     load(data: LogPrisma) {

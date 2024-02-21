@@ -75,7 +75,7 @@ export class User {
             })
 
             const user = new User(user_prisma.id)
-            await user.init()
+            user.load(user_prisma)
             if (data.image) {
                 // @ts-ignore
                 if (data.image?.file) {
@@ -96,10 +96,10 @@ export class User {
     static async list(socket: Socket) {
         const users_prisma = await prisma.user.findMany({ include })
         const users = await Promise.all(
-            users_prisma.map(async (user) => {
-                const new_user = new User(user.id)
-                await new_user.init()
-                return new_user
+            users_prisma.map(async (user_prisma) => {
+                const user = new User(user_prisma.id)
+                user.load(user_prisma)
+                return user
             })
         )
 
@@ -114,7 +114,7 @@ export class User {
 
         if (user_prisma) {
             const user = new User(user_prisma.id)
-            await user.init()
+            user.load(user_prisma)
             socket.emit("user:login", user)
         } else {
             socket.emit("user:login", null)
@@ -123,11 +123,11 @@ export class User {
 
     static async delete(socket: Socket, id: number, user_id: number) {
         try {
-            const deleted = await prisma.user.delete({ where: { id } })
+            const deleted = await prisma.user.delete({ where: { id }, include })
             socket.emit("user:delete:success", deleted)
             socket.broadcast.emit("user:delete", deleted)
             const user = new User(user_id)
-            await user.init()
+            user.load(deleted)
             user.log(`deletou o usuário (${deleted.id}) ${deleted.name}`, user_id)
         } catch (error) {
             console.log(error)

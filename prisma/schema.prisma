@@ -27,9 +27,11 @@ model User {
 }
 
 model Product {
-  id         Int        @id @default(autoincrement())
-  name       String
-  categories Category[] @relation(name: "CategoryToProduct")
+  id          Int        @id @default(autoincrement())
+  name        String
+  categories  Category[] @relation(name: "CategoryToProduct")
+  supplier_id Int
+  supplier    Supplier   @relation(name: "ProductToSupplier", fields: [supplier_id], references: [id], onDelete: Cascade)
 }
 
 model Category {
@@ -43,6 +45,25 @@ model Log {
   id        Int    @id @default(autoincrement())
   text      String
   timestamp String
+}
+
+model Supplier {
+  id         Int       @id @default(autoincrement())
+  name       String
+  cnpj       String
+  code       String
+  contact_id Int       @unique
+  contact    Contact   @relation(name: "ContactToSupplier", fields: [contact_id], references: [id], onDelete: Cascade)
+  products   Product[] @relation(name: "ProductToSupplier")
+}
+
+model Contact {
+  id          Int       @id @default(autoincrement())
+  name        String
+  phone       String?
+  email       String?
+  supplier_id Int?
+  supplier    Supplier? @relation(name: "ContactToSupplier")
 }
 
 model Address {
