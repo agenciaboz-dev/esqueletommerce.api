@@ -27,11 +27,68 @@ model User {
 }
 
 model Product {
-  id          Int        @id @default(autoincrement())
-  name        String
-  categories  Category[] @relation(name: "CategoryToProduct")
-  supplier_id Int
-  supplier    Supplier   @relation(name: "ProductToSupplier", fields: [supplier_id], references: [id], onDelete: Cascade)
+  id            Int         @id @default(autoincrement())
+  active        Boolean     @default(true)
+  sku           String      @unique
+  name          String
+  description   String      @db.Text
+  technical     String      @db.Text
+  brand         String
+  stock         Int         @default(0)
+  price         Float
+  profit        Float       @default(25)
+  cost          Float       @default(0)
+  rating        Float       @default(0)
+  ratings       Int         @default(0)
+  sold          Int         @default(0)
+  gallery       Image[]     @relation(name: "ImageToProduct")
+  variations    Variation[] @relation(name: "ProductToVariation")
+  dimensions_id Int         @unique
+  dimensions    Dimensions  @relation(name: "DimensionsToProduct", fields: [dimensions_id], references: [id], onDelete: Cascade)
+  categories    Category[]  @relation(name: "CategoryToProduct")
+  supplier_id   Int
+  supplier      Supplier    @relation(name: "ProductToSupplier", fields: [supplier_id], references: [id], onDelete: Cascade)
+}
+
+model Image {
+  id         Int      @id @default(autoincrement())
+  url        String
+  product_id Int?
+  product    Product? @relation(name: "ImageToProduct", fields: [product_id], references: [id], onDelete: Cascade)
+  option_id  Int?
+  option     Option?  @relation(name: "ImageToOption", fields: [option_id], references: [id], onDelete: Cascade)
+}
+
+model Variation {
+  id       Int       @id @default(autoincrement())
+  type     String    @unique
+  options  Option[]  @relation(name: "OptionToVariation")
+  products Product[] @relation(name: "ProductToVariation")
+}
+
+model Option {
+  id            Int         @id @default(autoincrement())
+  name          String
+  sku           String?
+  price         Float?
+  stock         Int?
+  dimensions_id Int?        @unique
+  dimensions    Dimensions? @relation(name: "DimensionsToOption", fields: [dimensions_id], references: [id], onDelete: Cascade)
+  gallery       Image[]     @relation(name: "ImageToOption")
+  variation_id  Int
+  variation     Variation   @relation(name: "OptionToVariation", fields: [variation_id], references: [id], onDelete: Cascade)
+}
+
+model Dimensions {
+  id         Int      @id @default(autoincrement())
+  weight     Float
+  height     Float
+  lenght     Float
+  width      Float
+  product_id Int?
+  product    Product? @relation(name: "DimensionsToProduct")
+  option_id  Int?
+  option     Option?  @relation(name: "DimensionsToOption")
 }
 
 model Category {
