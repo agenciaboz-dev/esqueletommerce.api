@@ -13,6 +13,7 @@ export declare interface SignupForm extends User {
     load?: (data: UserPrisma) => Promise<void>
     update?: (data: Partial<UserPrisma>, socket?: Socket) => Promise<void>
     updateImage?: (image: ImageUpload) => void
+    log?: (text: string, user_id?: number) => Promise<void>
 
     address?: SignupAddress
     image?: string | ImageUpload | null

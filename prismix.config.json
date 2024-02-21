@@ -6,6 +6,7 @@
                 "prisma/models/user.prisma",
                 "prisma/models/product.prisma",
                 "prisma/models/category.prisma",
+                "prisma/models/log.prisma",
                 "prisma/models/address.prisma"
             ],
             "output": "prisma/schema.prisma"

@@ -39,6 +39,12 @@ model Category {
   products Product[] @relation(name: "CategoryToProduct")
 }
 
+model Log {
+  id        Int    @id @default(autoincrement())
+  text      String
+  timestamp String
+}
+
 model Address {
   id       Int    @id @default(autoincrement())
   cep      String

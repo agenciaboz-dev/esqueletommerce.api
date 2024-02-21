@@ -10,6 +10,7 @@ import { Address } from "./Address"
 import { handlePrismaError, user_errors } from "../prisma/errors"
 import { ImageUpload } from "../types/shared/ImageUpload"
 import { saveImage } from "../tools/saveImage"
+import { Log } from "./Log"
 
 export type UserPrisma = Prisma.UserGetPayload<{ include: typeof include }>
 
@@ -44,13 +45,14 @@ export class User {
         }
     }
 
-    static async update(data: Partial<UserPrisma> & { id: number }, socket: Socket) {
+    static async update(data: Partial<UserPrisma> & { id: number }, socket: Socket, user_id?: number) {
         const user = new User(data.id)
         await user.init()
-        user.update(data, socket)
+        await user.update(data, socket)
+        user.log(user_id ? `atualizou o usuário (${user.id}) ${user.name}` : "se atualizou", user_id)
     }
 
-    static async signup(socket: Socket, data: SignupForm) {
+    static async signup(socket: Socket, data: SignupForm, user_id?: number) {
         try {
             const user_prisma = await prisma.user.create({
                 data: {
@@ -85,6 +87,7 @@ export class User {
 
             socket.emit("user:signup:success", user)
             socket.broadcast.emit("user:signup", user)
+            user.log(user_id ? `cadastrou o usuário (${user.id}) ${user.name}` : "se cadastrou", user_id)
         } catch (error) {
             handlePrismaError(error, socket) || socket.emit("user:signup:error", error?.toString())
         }
@@ -118,11 +121,14 @@ export class User {
         }
     }
 
-    static async delete(socket: Socket, id: number) {
+    static async delete(socket: Socket, id: number, user_id: number) {
         try {
             const deleted = await prisma.user.delete({ where: { id } })
             socket.emit("user:delete:success", deleted)
             socket.broadcast.emit("user:delete", deleted)
+            const user = new User(user_id)
+            await user.init()
+            user.log(`deletou o usuário (${deleted.id}) ${deleted.name}`, user_id)
         } catch (error) {
             console.log(error)
             socket.emit("user:delete:error", error?.toString())
@@ -199,5 +205,16 @@ export class User {
                 handlePrismaError(error, socket) || socket.emit("user:update:error", error?.toString())
             }
         }
+    }
+
+    async log(text: string, user_id?: number) {
+        let user: User
+        user = this
+        if (user_id) {
+            user = new User(user_id)
+            await user.init()
+        }
+
+        new Log({ text: `(${user.id}) ${user.name} ${text}` })
     }
 }

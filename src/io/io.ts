@@ -35,16 +35,16 @@ export const handleSocket = (socket: Socket) => {
     socket.on("google:exchange", (data) => google.login.exchangeCode(socket, data))
     socket.on("google:link", (user) => google.person.link(socket, user))
 
-    socket.on("user:signup", (data: SignupForm) => User.signup(socket, data))
+    socket.on("user:signup", (data: SignupForm, user_id?: number) => User.signup(socket, data, user_id))
     socket.on("user:list", () => User.list(socket))
     socket.on("user:login", (data: LoginForm) => User.login(socket, data))
-    socket.on("user:update", (data: Partial<UserPrisma> & { id: number }) => User.update(data, socket))
-    socket.on("user:delete", (data: { id: number }) => User.delete(socket, data.id))
+    socket.on("user:update", (data: Partial<UserPrisma> & { id: number }, user_id?: number) => User.update(data, socket, user_id))
+    socket.on("user:delete", (data: { id: number; user_id: number }) => User.delete(socket, data.id, data.user_id))
 
     socket.on("category:list", () => Category.list(socket))
     socket.on("category:new", (data: CategoryForm) => Category.new(socket, data))
-    socket.on("category:update", (data: Partial<CategoryPrisma> & { id: number }) => Category.update(socket, data))
-    socket.on("category:delete", (data: { id: number }) => Category.delete(socket, data.id))
+    socket.on("category:update", (data: Partial<CategoryPrisma> & { id: number; user_id: number }) => Category.update(socket, data))
+    socket.on("category:delete", (data: { id: number; user_id: number }) => Category.delete(socket, data.id, data.user_id))
 
     socket.on("cep:search", (data: { cep: string }) => Address.searchCep(data.cep, socket))
 }
