@@ -80,7 +80,7 @@ export class User {
                 // @ts-ignore
                 if (data.image?.file) {
                     // @ts-ignore
-                    const url = saveImage(`users/${this.id}/`, image.file as ArrayBuffer, image.name)
+                    const url = saveImage(`users/${this.id}/`, data.image.file as ArrayBuffer, data.image.name)
                     await user.update({ image: url })
                 }
             }
