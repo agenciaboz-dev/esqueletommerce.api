@@ -2,15 +2,15 @@ import { Prisma } from "@prisma/client"
 import { user as include } from "../prisma/include"
 import { prisma } from "../prisma"
 import { Socket } from "socket.io"
-import { SignupForm } from "../types/shared/user/signup"
+// import { SignupForm } from "../types/shared/user/signup"
 import { LoginForm } from "../types/shared/user/login"
-import { Address } from "./Address"
+import { Address, AddressForm } from "./Address"
 import { handlePrismaError, user_errors } from "../prisma/errors"
 import { saveImage } from "../tools/saveImage"
 import { Log } from "./Log"
+import { ImageUpload, WithoutFunctions } from "./methodizer"
 
 export type UserPrisma = Prisma.UserGetPayload<{ include: typeof include }>
-
 export class User {
     id: number
     email: string
@@ -22,7 +22,7 @@ export class User {
     pronoun: string
     admin: boolean
 
-    image: string | null
+    image?: string | null | ImageUpload
 
     google_id: string | null
     google_token: string | null
@@ -49,7 +49,7 @@ export class User {
         user.log(user_id ? `atualizou o usuário (${user.id}) ${user.name}` : "se atualizou", user_id)
     }
 
-    static async signup(socket: Socket, data: SignupForm, user_id?: number) {
+    static async signup(socket: Socket, data: UserForm, user_id?: number) {
         try {
             const user_prisma = await prisma.user.create({
                 data: {
@@ -215,3 +215,5 @@ export class User {
         new Log({ text: `(${user.id}) ${user.name} ${text}` })
     }
 }
+
+export type UserForm = Omit<WithoutFunctions<User>, "address" | "id"> & { address?: AddressForm; id?: number }
