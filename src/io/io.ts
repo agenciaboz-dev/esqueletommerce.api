@@ -3,8 +3,7 @@ import { Server as HttpServer } from "http"
 import { Server as HttpsServer } from "https"
 import { Socket } from "socket.io"
 import google from "../google"
-import { SignupForm } from "../types/shared/user/signup"
-import { User, UserPrisma } from "../class/User"
+import { User, UserForm, UserPrisma } from "../class/User"
 import { LoginForm } from "../types/shared/user/login"
 import { Category, CategoryPrisma } from "../class/Category"
 import { Address } from "../class/Address"
@@ -39,7 +38,7 @@ export const handleSocket = (socket: Socket) => {
     socket.on("google:exchange", (data) => google.login.exchangeCode(socket, data))
     socket.on("google:link", (user) => google.person.link(socket, user))
 
-    socket.on("user:signup", (data: SignupForm, user_id?: number) => User.signup(socket, data, user_id))
+    socket.on("user:signup", (data: UserForm, user_id?: number) => User.signup(socket, data, user_id))
     socket.on("user:list", () => User.list(socket))
     socket.on("user:login", (data: LoginForm) => User.login(socket, data))
     socket.on("user:update", (data: Partial<UserPrisma> & { id: number }, user_id?: number) => User.update(data, socket, user_id))
