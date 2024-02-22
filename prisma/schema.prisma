@@ -36,8 +36,9 @@ model Product {
   brand         String
   stock         Int         @default(0)
   price         Float
-  profit        Float       @default(25)
-  cost          Float       @default(0)
+  promotion     Float       @default(0)
+  profit        Float       @default(100)
+  cost          Float
   rating        Float       @default(0)
   ratings       Int         @default(0)
   sold          Int         @default(0)
@@ -71,6 +72,7 @@ model Option {
   name          String
   sku           String?
   price         Float?
+  promotion     Float?
   stock         Int?
   dimensions_id Int?        @unique
   dimensions    Dimensions? @relation(name: "DimensionsToOption", fields: [dimensions_id], references: [id], onDelete: Cascade)
@@ -83,7 +85,7 @@ model Dimensions {
   id         Int      @id @default(autoincrement())
   weight     Float
   height     Float
-  lenght     Float
+  length     Float
   width      Float
   product_id Int?
   product    Product? @relation(name: "DimensionsToProduct")

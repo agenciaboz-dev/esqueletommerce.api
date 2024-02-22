@@ -1,6 +1,7 @@
 import { Prisma } from "@prisma/client"
 import viacep from "../api/viacep"
 import { Socket } from "socket.io"
+import { WithoutFunctions } from "./methodizer"
 
 export type AddressPrisma = Prisma.AddressGetPayload<{}>
 
@@ -43,3 +44,5 @@ export class Address {
         this.user_id = data.user_id
     }
 }
+
+export type AddressForm = Omit<WithoutFunctions<Address>, "id" | "user_id">

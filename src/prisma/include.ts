@@ -11,8 +11,13 @@ export const supplier = Prisma.validator<Prisma.SupplierInclude>()({
     contact: true,
 })
 
+export const option = Prisma.validator<Prisma.OptionInclude>()({
+    dimensions: true,
+    gallery: true,
+})
+
 export const variation = Prisma.validator<Prisma.VariationInclude>()({
-    options: { include: { dimensions: true, gallery: true } },
+    options: { include: option },
 })
 
 export const product = Prisma.validator<Prisma.ProductInclude>()({
