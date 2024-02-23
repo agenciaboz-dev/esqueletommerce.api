@@ -22,6 +22,7 @@ model Product {
     ratings         Int         @default(0)
     sold            Int         @default(0)
 
+    cover_url       String
     gallery         Image[]
     variations      Variation[]
 
@@ -53,6 +54,7 @@ model Option {
     id              Int         @id @default(autoincrement())
     name            String
 
+    cover_url       String?
     sku             String?
     price           Float?
     promotion       Float?

@@ -7,17 +7,27 @@ import { Socket } from "socket.io"
 import { Dimensions } from "./Dimensions"
 import { Image } from "./Image"
 import { Variation } from "./Variation"
-import { WithoutFunctions } from "./methodizer"
+import { ImageUpload, WithoutFunctions } from "./methodizer"
+import { saveImage } from "../tools/saveImage"
 
 export type ProductPrisma = Prisma.ProductGetPayload<{ include: typeof include }>
 
-export type ProductForm = Omit<WithoutFunctions<Product>, "id" | "active" | "rating" | "ratings" | "sold" | "dimensions_id" | "supplier"> & {
+export type ProductForm = Omit<
+    WithoutFunctions<Product>,
+    "id" | "active" | "rating" | "ratings" | "sold" | "dimensions_id" | "supplier" | "categories" | "cover_url" | "gallery"
+> & {
     id?: number
     active?: boolean
     rating?: number
     ratings?: number
     sold?: number
     dimensions_id?: number
+    cover_url?: string
+
+    cover_file?: ImageUpload
+    gallery: ImageUpload[] | Image[]
+
+    categories: number[]
 }
 export class Product {
     id: number
@@ -38,6 +48,7 @@ export class Product {
     rating: number
     ratings: number
     sold: number
+    cover_url: string
 
     categories: Category[]
 
@@ -77,10 +88,11 @@ export class Product {
                     id: undefined,
                     dimensions_id: undefined,
                     supplier_id: undefined,
+                    cover_url: "",
 
-                    categories: { connect: data.categories.map((category) => ({ id: category.id })) },
+                    categories: { connect: data.categories.map((category_id) => ({ id: category_id })) },
                     dimensions: { create: data.dimensions },
-                    gallery: { create: data.gallery },
+                    gallery: {},
                     variations: {
                         create: data.variations.map((variation) => ({
                             ...variation,
@@ -125,6 +137,7 @@ export class Product {
         this.sold = data.sold
         this.supplier_id = data.supplier_id
         this.dimensions_id = data.dimensions_id
+        this.cover_url = data.cover_url
 
         this.variations = data.variations.map((variation) => new Variation(variation))
         this.gallery = data.gallery.map((image) => new Image(image))

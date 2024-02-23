@@ -10,6 +10,7 @@ export class VariationOption {
     id: number
     name: string
     sku: string | null
+    cover_url: string | null
     price: number | null
     promotion: number | null
     stock: number | null
@@ -22,6 +23,7 @@ export class VariationOption {
         this.id = data.id
         this.name = data.name
         this.sku = data.sku
+        this.cover_url = data.cover_url
         this.price = data.price
         this.promotion = data.promotion
         this.stock = data.stock
